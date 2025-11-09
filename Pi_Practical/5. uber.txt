@@ -1,0 +1,78 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import r2_score, mean_squared_error
+from math import sqrt
+
+df = pd.read_csv("uber.csv")   # Change filename if needed
+
+print(df.head())
+print(df.info())
+print(df.describe())
+print(df.columns)
+
+print(df.isnull().sum()))
+
+plt.figure(figsize=(6,4))
+sns.boxplot(x=df['fare_amount'])
+plt.title("Boxplot to Identify Outliers in Fare Amount")
+plt.xlabel("Fare Amount ($)")
+plt.show()
+
+df = df.dropna()
+
+ddf=df[(df['fare_amount']>0)&(df['fare_amount']<200)]
+df=df[(df['passenger_count']>0)&(df['passenger_count']<=6)]
+
+df['pickup_datetime']=pd.to_datetime(df['pickup_datetime'],errors='coerce')
+df=df.dropna(subset=['pickup_datetime'])
+
+df['year']=df['pickup_datetime'].dt.year
+df['month']=df['pickup_datetime'].dt.month
+df['day']=df['pickup_datetime'].dt.day
+df['hour']=df['pickup_datetime'].dt.hour
+
+df_numeric=df.drop(['Unnamed: 0','key','pickup_datetime'],axis=1)
+plt.figure(figsize=(8,6))
+corr_matrix=df_numeric.corr()
+sns.heatmap(corr_matrix,annot=True,cmap='coolwarm')
+plt.title("feature correlation heatmap")
+plt.show()
+
+features=['pickup_longitude', 'pickup_latitude', 'dropoff_longitude',
+       'dropoff_latitude', 'passenger_count','year','month','day','hour']
+x=df[features]
+y=df['fare_amount']
+
+x_train,x_test,y_train,y_test=train_test_split(x,y,test_size=0.2,random_state=42)
+
+lr=LinearRegression()
+lr.fit(x_train,y_train)
+y_pred_lr=lr.predict(x_test)
+
+r2_lr=r2_score(y_test,y_pred_lr)
+rmse_lr=sqrt(mean_squared_error(y_test,y_pred_lr))
+print("\nLiner Regression R2: ",r2_lr)
+print("Linear Regression RMSE: ",rmse_lr)
+
+rf=RandomForestRegressor(n_estimators=100,random_state=42,n_jobs=-1)
+rf.fit(x_train,y_train)
+y_pred_rf=rf.predict(x_test)
+
+r2_rf=r2_score(y_test,y_pred_rf)
+rmse_rf=sqrt(mean_squared_error(y_test,y_pred_rf))
+print("\nRandom Forest R2: ",r2_rf)
+print("Random Forest RMSE: ",rmse_rf)
+
+comparison = pd.DataFrame({
+    'Actual Fare': y_test.values[:5],
+    'Linear Predicted Fare': y_pred_lr[:5],
+    'RF Predicted Fare': y_pred_rf[:5]
+})
+print(comparison)
+

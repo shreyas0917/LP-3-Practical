@@ -1,0 +1,40 @@
+1.
+n = int(input("Enter the number of terms: "))
+
+a, b = 0, 1
+step_count = 0
+
+print("Fibonacci Series:")
+for i in range(n):
+    print(a, end=" ")
+    step_count += 1            
+    a, b = b, a + b            
+
+print("\nTotal Steps:", step_count)
+
+
+
+
+2.
+step_count = 0
+
+def fibonacci(n):
+    global step_count
+    step_count += 1             
+    
+    if n == 0:
+        return 0
+    elif n == 1:
+        return 1
+    else:
+        return fibonacci(n - 1) + fibonacci(n - 2)
+
+
+num = int(input("Enter the position of Fibonacci number: "))
+
+
+result = fibonacci(num)
+
+
+print(f"Fibonacci number at position {num} is {result}")
+print("Total Steps:", step_count)

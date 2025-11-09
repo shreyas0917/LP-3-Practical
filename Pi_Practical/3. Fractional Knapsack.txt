@@ -1,0 +1,24 @@
+n = int(input("Enter number of items: "))
+
+weights = []
+values = []
+
+for i in range(n):
+    weights.append(float(input("Enter weight: ")))
+    values.append(float(input("Enter value: ")))
+
+capacity = float(input("Enter knapsack capacity: "))
+
+items = sorted([(values[i]/weights[i], weights[i], values[i]) for i in range(n)], reverse=True)
+
+total_value = 0
+
+for r, w, v in items:
+    if capacity >= w:
+        total_value += v
+        capacity -= w
+    else:
+        total_value += r * capacity
+        break
+
+print("Maximum value in knapsack:", total_value)
